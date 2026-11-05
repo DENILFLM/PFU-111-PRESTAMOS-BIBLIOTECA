@@ -84,3 +84,53 @@ def es_duplicado(prestamos, codigo, titulo):
         if p["codigo"] == codigo and p["titulo"].lower() == titulo.lower():
             return True
     return False
+
+# PERSISTENCIA (archivo CSV)
+def cargar_prestamos():
+    """Lee los préstamos desde el CSV. Ignora filas dañadas o inválidas
+    (el sistema legado tenía datos inconsistentes)."""
+    prestamos = []
+    ignoradas = 0
+
+    try:
+        with open(ARCHIVO_CSV, mode="r", newline="", encoding="utf-8") as archivo:
+            lector = csv.DictReader(archivo)
+            for fila in lector:
+                try:
+                    codigo = limpiar_texto(fila.get("codigo") or "").upper()
+                    nombre = limpiar_texto(fila.get("nombre") or "")
+                    titulo = limpiar_texto(fila.get("titulo") or "")
+                    ok_dias, dias = validar_dias(fila.get("dias") or "")
+
+                    if (validar_codigo(codigo)[0] and validar_nombre(nombre)[0]
+                            and validar_titulo(titulo)[0] and ok_dias
+                            and not es_duplicado(prestamos, codigo, titulo)):
+                        prestamos.append({"codigo": codigo, "nombre": nombre,
+                                          "titulo": titulo, "dias": dias})
+                    else:
+                        ignoradas += 1
+                except (AttributeError, TypeError):
+                    ignoradas += 1
+    except FileNotFoundError:
+        return prestamos  # primera ejecución: aún no existe el archivo
+    except (OSError, csv.Error, UnicodeDecodeError) as error:
+        print(f"[!] No se pudo leer el archivo '{ARCHIVO_CSV}': {error}")
+        return prestamos
+
+    if ignoradas > 0:
+        print(f"[!] Se ignoraron {ignoradas} registro(s) inválidos o duplicados del archivo.")
+    return prestamos
+
+
+def guardar_prestamos(prestamos):
+    try:
+        with open(ARCHIVO_CSV, mode="w", newline="", encoding="utf-8") as archivo:
+            escritor = csv.DictWriter(archivo, fieldnames=CAMPOS)
+            escritor.writeheader()
+            escritor.writerows(prestamos)
+        return True
+    except OSError as error:
+        print(f"[!] No se pudo guardar el archivo: {error}")
+        return False
+
+
