@@ -1,4 +1,7 @@
 # Sistema de Préstamos de Materiales
+- Ronald Cruz Chino.
+- Denilson Davis Machaca Flores.
+- Daniel Wilfredo Pomarez Huaranca
 
 **Materia:** Programación Fundamental
 
