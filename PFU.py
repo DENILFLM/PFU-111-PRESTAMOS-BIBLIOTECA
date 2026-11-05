@@ -169,5 +169,69 @@ def pedir_dias():
             return resultado
         print(f"  [x] {resultado}")
 
+# OPERACIONES DEL MENÚ
+def registrar_prestamo(prestamos):
+    print("\n--- REGISTRAR NUEVO PRÉSTAMO ---")
+    try:
+        codigo = pedir_codigo()
+        nombre = pedir_nombre()
+        titulo = pedir_titulo()
+
+        if es_duplicado(prestamos, codigo, titulo):
+            print("[x] Préstamo duplicado: ese estudiante ya tiene registrado ese material.")
+            return
+
+        dias = pedir_dias()
+    except (KeyboardInterrupt, EOFError):
+        print("\n[!] Registro cancelado.")
+        return
+
+    nuevo = {"codigo": codigo, "nombre": nombre, "titulo": titulo, "dias": dias}
+    prestamos.append(nuevo)
+
+    if guardar_prestamos(prestamos):
+        print("[✓] Préstamo registrado y guardado correctamente.")
+    else:
+        prestamos.pop()  # se revierte para mantener consistencia con el archivo
+        print("[x] El préstamo no se registró porque no se pudo guardar.")
+
+
+def mostrar_tabla(lista):
+    """Imprime los préstamos en formato tabla (con el código enmascarado)."""
+    print(f"\n{'N°':<4}{'Código':<12}{'Estudiante':<28}{'Material':<32}{'Días':<5}")
+    print("-" * 81)
+    for i, p in enumerate(lista, start=1):
+        print(f"{i:<4}{enmascarar_codigo(p['codigo']):<12}"
+              f"{p['nombre'][:26]:<28}{p['titulo'][:30]:<32}{p['dias']:<5}")
+    print(f"\nTotal: {len(lista)} préstamo(s).")
+
+
+def consultar_prestamos(prestamos):
+    print("\n--- CONSULTAR PRÉSTAMOS ---")
+    if len(prestamos) == 0:
+        print("No hay préstamos registrados.")
+        return
+
+    print("1. Ver todos los préstamos")
+    print("2. Buscar por código de estudiante")
+    opcion = input("Elija una opción: ").strip()
+
+    if opcion == "1":
+        mostrar_tabla(prestamos)
+    elif opcion == "2":
+        codigo = limpiar_texto(input("Código del estudiante: ")).upper()
+        valido, mensaje = validar_codigo(codigo)
+        if not valido:
+            print(f"[x] {mensaje}")
+            return
+        encontrados = [p for p in prestamos if p["codigo"] == codigo]
+        if len(encontrados) == 0:
+            print("No se encontraron préstamos para ese código.")
+        else:
+            mostrar_tabla(encontrados)
+    else:
+        print("[x] Opción inválida.")
+
+
 
 
