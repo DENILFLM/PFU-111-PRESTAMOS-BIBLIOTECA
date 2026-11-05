@@ -133,4 +133,41 @@ def guardar_prestamos(prestamos):
         print(f"[!] No se pudo guardar el archivo: {error}")
         return False
 
+# ENTRADA DE DATOS (repite hasta que el dato sea válido)
+def pedir_codigo():
+    while True:
+        codigo = limpiar_texto(input("Código del estudiante (ej. SIS-123456): ")).upper()
+        valido, mensaje = validar_codigo(codigo)
+        if valido:
+            return codigo
+        print(f"  [x] {mensaje}")
+
+
+def pedir_nombre():
+    while True:
+        nombre = limpiar_texto(input("Nombre del estudiante: "))
+        valido, mensaje = validar_nombre(nombre)
+        if valido:
+            return nombre
+        print(f"  [x] {mensaje}")
+
+
+def pedir_titulo():
+    while True:
+        titulo = limpiar_texto(input("Título del material solicitado: "))
+        valido, mensaje = validar_titulo(titulo)
+        if valido:
+            return titulo
+        print(f"  [x] {mensaje}")
+
+
+def pedir_dias():
+    while True:
+        texto = input(f"Cantidad de días del préstamo ({DIAS_MIN}-{DIAS_MAX}): ").strip()
+        valido, resultado = validar_dias(texto)
+        if valido:
+            return resultado
+        print(f"  [x] {resultado}")
+
+
 
