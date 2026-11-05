@@ -48,5 +48,4 @@ El archivo CSV se crea al guardar los primeros registros.
 ## Validaciones
 El sistema comprueba que los datos ingresados sean correctos antes de almacenarlos, evitando información vacía, formatos incorrectos y préstamos duplicados.
 
-## Autor
-Estudiante de Ingeniería de Sistemas.
+
